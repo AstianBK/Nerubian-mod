@@ -1,0 +1,13 @@
+{
+  "itemGroup.nerubianmod": "Example Mod Tab",
+  "block.nerubianmod.example_block": "Example Block",
+  "item.nerubianmod.example_item": "Example Item",
+
+  "nerubianmod.configuration.title": "Nerubian Mod Configs",
+  "nerubianmod.configuration.section.nerubianmod.common.toml": "Nerubian Mod Configs",
+  "nerubianmod.configuration.section.nerubianmod.common.toml.title": "Nerubian Mod Configs",
+  "nerubianmod.configuration.items": "Item List",
+  "nerubianmod.configuration.logDirtBlock": "Log Dirt Block",
+  "nerubianmod.configuration.magicNumberIntroduction": "Magic Number Text",
+  "nerubianmod.configuration.magicNumber": "Magic Number"
+}
