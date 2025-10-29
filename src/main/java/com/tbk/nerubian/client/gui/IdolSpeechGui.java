@@ -1,5 +1,6 @@
 package com.tbk.nerubian.client.gui;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.tbk.nerubian.NerubianMod;
 import com.tbk.nerubian.server.cap.NerubianCap;
@@ -30,15 +31,29 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         Minecraft mc = Minecraft.getInstance();
         if(mc.player==null)return;
+        int height = guiGraphics.guiHeight();
+        int width = guiGraphics.guiWidth();
         Player player = mc.player;
         float partialTick = deltaTracker.getRealtimeDeltaTicks();
         NerubianCap.get(player).ifPresent(cap->{
             float percent = cap.getAnimSpeech(partialTick);
             if(percent>0){
-                int index = (int) ((player.tickCount+partialTick) % 4.0F);
-                //guiGraphics.blit(location, (int) centerX, (int) centerY, 0,0, Mth.ceil(18 + 128*percent),  Mth.ceil(18 + 128*percent), Mth.ceil(18 + 128*percent) ,  Mth.ceil(18 + 128*percent));
-                //guiGraphics.blit(location, (int) centerX, (int) centerY, 0,0, Mth.ceil(18 + 128*percent),  Mth.ceil(18 + 128*percent), Mth.ceil(18 + 128*percent) ,  Mth.ceil(18 + 128*percent));
 
+                int i = width / 2 -140;
+                int j1 =  i + 101;
+                int k1 = height - 58 ;
+
+                float xExtra = 129;
+                float yExtra = 13;
+
+                float centerX = (j1 + xExtra);
+                float centerY = (k1 + yExtra);
+
+                int index = (int) ((player.tickCount+partialTick) % 4.0F);
+                ResourceLocation locationSpeech = FRAMES_SPEECH[index];
+                guiGraphics.blit(locationSpeech, (int) centerX, (int) centerY, 0,0, Mth.ceil(18 + 128*percent),  Mth.ceil(18 + 128*percent), Mth.ceil(18 + 128*percent) ,  Mth.ceil(18 + 128*percent));
+                ResourceLocation locationBackground = FRAMES_BACKGROUND[index];
+                guiGraphics.blit(locationBackground, (int) centerX, (int) centerY, 0,0, Mth.ceil(18 + 128*percent),  Mth.ceil(18 + 128*percent), Mth.ceil(18 + 128*percent) ,  Mth.ceil(18 + 128*percent));
             }
         });
     }

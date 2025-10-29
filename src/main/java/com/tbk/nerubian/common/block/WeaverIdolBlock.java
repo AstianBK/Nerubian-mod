@@ -25,6 +25,10 @@ public class WeaverIdolBlock extends Block {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         NerubianCap.get(player).ifPresent(e->{
             if(e.currentQuest!=null && !e.currentQuest.isComplete(e))return;
+            if(level.isClientSide){
+                e.speechTime = 160;
+                e.speechTimeO = 160;
+            }
             if(e.currentQuest!=null && e.currentQuest.isComplete(e)){
                 e.progressQuest = 0;
                 e.currentQuest = null;
