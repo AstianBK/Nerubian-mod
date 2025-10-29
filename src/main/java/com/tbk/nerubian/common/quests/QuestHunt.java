@@ -14,7 +14,9 @@ public class QuestHunt extends Quest{
         this.entityTypeId = buf.readUtf();
         this.toHuntEntities = buf.readInt();
     }
-
+    public String getTargetId(){
+        return this.entityTypeId;
+    }
     public int getMaxProgress(){
         return this.toHuntEntities;
     }

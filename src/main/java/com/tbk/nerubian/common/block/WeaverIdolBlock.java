@@ -43,6 +43,6 @@ public class WeaverIdolBlock extends Block {
             throw new IllegalArgumentException("La lista no puede estar vacía o ser null.");
         }
         Random random = new Random();
-        return list.get(random.nextInt(list.size())); // Devuelve un número entre 0 y list.size() - 1
+        return list.get(random.nextInt(list.size()));
     }
 }

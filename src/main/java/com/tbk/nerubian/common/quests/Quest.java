@@ -19,6 +19,10 @@ public class Quest {
         this.tier = tier;
     }
 
+    public String getTargetId(){
+        return null;
+    }
+
     public String getTitle() {
         return title;
     }

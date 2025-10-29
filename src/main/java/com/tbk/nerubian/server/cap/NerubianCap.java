@@ -3,16 +3,26 @@ package com.tbk.nerubian.server.cap;
 import com.tbk.nerubian.common.api.INerubian;
 import com.tbk.nerubian.common.quests.Quest;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
@@ -27,9 +37,12 @@ public class NerubianCap implements INerubian {
     public AnimationState swim = new AnimationState();
 
     public Quest currentQuest=null;
+    public int speechTime=0;
+    public int speechTimeO=0;
     public int progressQuest=0;
     public int idleTimer = 0;
     public int nerubianTier = 0;
+    public int previousTimesChanged = 0;
     ServerBossEvent event =  (ServerBossEvent)(new ServerBossEvent(Component.translatable("next_wave"), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS)).setPlayBossMusic(true).setCreateWorldFog(false);
 
     public void tick(Player player){
@@ -51,8 +64,18 @@ public class NerubianCap implements INerubian {
                 event.removeAllPlayers();
             }
 
+            Inventory inventory = serverPlayer.getInventory();
+            if (inventory.getTimesChanged() != previousTimesChanged) {
+                previousTimesChanged = inventory.getTimesChanged();
+                this.refreshQuest(player);
+            }
         }
         if(player.level().isClientSide){
+            this.speechTimeO = this.speechTime;
+
+            if(this.speechTime>0){
+                this.speechTimeO--;
+            }
             if(this.idleTimer<=0){
                 this.idle.start(player.tickCount);
                 this.idleTimer = 20;
@@ -64,6 +87,21 @@ public class NerubianCap implements INerubian {
             //this.attack.animateWhen(player.getAttackAnim(1.0F)>0,player.tickCount);
             this.swim.animateWhen(player.isSwimming(),player.tickCount);
             this.block.animateWhen(player.getUseItem().getItem() instanceof ShieldItem,player.tickCount);
+        }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public float getAnimSpeech(float partialTick){
+        return Mth.lerp(partialTick,this.speechTimeO,this.speechTime);
+    }
+
+    public void refreshQuest(Player player){
+        Item itemQuest = BuiltInRegistries.ITEM.get(ResourceLocation.parse(this.currentQuest.getTargetId()));
+        for(int i = 0 ; i < player.getInventory().getContainerSize() ; i++){
+            ItemStack item = player.getInventory().getItem(i);
+            if(item.is(itemQuest)){
+                this.progressQuest = Math.min(item.getCount(),this.currentQuest.getMaxProgress());
+            }
         }
     }
 

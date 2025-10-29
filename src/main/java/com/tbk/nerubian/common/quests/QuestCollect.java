@@ -13,7 +13,9 @@ public class QuestCollect extends Quest{
         this.itemId = buf.readUtf();
         this.toCollect = buf.readInt();
     }
-
+    public String getTargetId(){
+        return this.itemId;
+    }
     public int getMaxProgress(){
         return this.toCollect;
     }

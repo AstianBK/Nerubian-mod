@@ -7,8 +7,11 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
@@ -44,13 +47,13 @@ public class Events {
     public static void onPick(ItemEntityPickupEvent.Pre event){
         NerubianCap.get(event.getPlayer()).ifPresent(e->{
             if(!e.currentQuest.isComplete(e)){
-                NerubianMod.LOGGER.debug("se puede agregar el nuevo item"+event.getItemEntity().getItem().getItem());
                 if(e.currentQuest.canAddProgress(event.getItemEntity().getItem().getItem().toString())){
-                    e.progressQuest = Math.min(e.currentQuest.getMaxProgress(),event.getItemEntity().getItem().getCount()+e.progressQuest);
+                    e.refreshQuest(event.getPlayer());
                 }
             }
         });
     }
+
     @SubscribeEvent
     public static void addQuestsData(AddReloadListenerEvent event){
         event.addListener(new QuestManager());

@@ -4,9 +4,12 @@ import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tbk.nerubian.client.ScarabRenderer;
+import com.tbk.nerubian.client.gui.IdolSpeechGui;
 import com.tbk.nerubian.client.layer.ItemScarabLayer;
 import com.tbk.nerubian.client.model.ScarabModel;
+import com.tbk.nerubian.server.cap.NerubianCap;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -29,6 +32,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderLivingEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntityUpsideDown;
@@ -179,6 +183,12 @@ public class NerubianModClient {
             default:
                 return 0.0F;
         }
+    }
+
+
+    @SubscribeEvent
+    public static void registerOverlays(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"idol_speech"), new IdolSpeechGui());
     }
 
 }
