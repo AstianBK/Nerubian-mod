@@ -1,0 +1,8 @@
+{
+  "title" : "Brain Zombie",
+  "description" : "tenes que cazar zombies hermano",
+  "type" : "HUNT",
+  "entityTypeId" : "minecraft:zombie",
+  "toHuntEntities" : 10,
+  "tier" : 0
+}

@@ -1,6 +1,7 @@
 package com.tbk.nerubian.common.registry;
 
 import com.tbk.nerubian.NerubianMod;
+import com.tbk.nerubian.common.block.WeaverIdolBlock;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -23,7 +24,7 @@ public class NRegistry {
             DeferredRegister.createItems(NerubianMod.MODID);
 
 
-    public static final DeferredBlock<Block> WEAVER_IDOL_BLOCK = BLOCKS.registerSimpleBlock("weaver_idol", BlockBehaviour.Properties.of().mapColor(MapColor.STONE));
+    public static final DeferredBlock<Block> WEAVER_IDOL_BLOCK = BLOCKS.register("weaver_idol",()->new WeaverIdolBlock( BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
 
     public static final DeferredItem<BlockItem> WEAVER_IDOL_ITEM = ITEMS.registerSimpleBlockItem("weaver_idol_item", WEAVER_IDOL_BLOCK);
 

@@ -1,9 +1,14 @@
 package com.tbk.nerubian.server.cap;
 
 import com.tbk.nerubian.common.api.INerubian;
+import com.tbk.nerubian.common.quests.Quest;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ShieldItem;
@@ -21,14 +26,32 @@ public class NerubianCap implements INerubian {
     public AnimationState burrow = new AnimationState();
     public AnimationState swim = new AnimationState();
 
+    public Quest currentQuest=null;
+    public int progressQuest=0;
     public int idleTimer = 0;
-    public void leftUse(Player player){
-        if(player.level().isClientSide){
-            this.use.stop();
-            this.use.start(player.tickCount);
-        }
-    }
+    public int nerubianTier = 0;
+    ServerBossEvent event =  (ServerBossEvent)(new ServerBossEvent(Component.translatable("next_wave"), BossEvent.BossBarColor.YELLOW, BossEvent.BossBarOverlay.PROGRESS)).setPlayBossMusic(true).setCreateWorldFog(false);
+
     public void tick(Player player){
+        if(player instanceof ServerPlayer serverPlayer){
+            boolean questActive = this.currentQuest!=null;
+            event.setVisible(questActive);
+            if(questActive){
+                if(!event.getPlayers().contains(serverPlayer)){
+                    event.addPlayer(serverPlayer);
+                }
+                Component component = Component.literal(this.currentQuest.getTitle());
+
+                event.setName(component);
+                BossEvent.BossBarColor color = getColorForQuestType();
+                event.setColor(color);
+                event.setProgress((float) this.progressQuest/this.currentQuest.getMaxProgress());
+
+            }else {
+                event.removeAllPlayers();
+            }
+
+        }
         if(player.level().isClientSide){
             if(this.idleTimer<=0){
                 this.idle.start(player.tickCount);
@@ -43,6 +66,23 @@ public class NerubianCap implements INerubian {
             this.block.animateWhen(player.getUseItem().getItem() instanceof ShieldItem,player.tickCount);
         }
     }
+
+    private BossEvent.BossBarColor getColorForQuestType() {
+        switch (this.currentQuest.getType()){
+            case HUNT -> {
+                return BossEvent.BossBarColor.RED;
+            }
+            case COLLECT -> {
+                return BossEvent.BossBarColor.GREEN;
+            }
+            case SACRIFICE -> {
+                return BossEvent.BossBarColor.PURPLE;
+
+            }
+        }
+        return BossEvent.BossBarColor.WHITE;
+    }
+
     @Override
     public Tag serializeNBT(HolderLookup.Provider provider) {
         return new CompoundTag();
