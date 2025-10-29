@@ -1,0 +1,8 @@
+{
+  "title" : "Recollect 10 Rotten Flesh",
+  "description" : "tenes que cazar zombies hermano",
+  "type" : "COLLECT",
+  "itemId" : "minecraft:rotten_flesh",
+  "toCollect" : 10,
+  "tier" : 0
+}

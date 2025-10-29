@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.mojang.logging.LogUtils;
+import com.tbk.nerubian.QuestsType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
@@ -38,12 +39,17 @@ public class QuestManager extends SimpleJsonResourceReloadListener {
                     LOGGER.info("Skipping loading quests {} as it's serializer returned null", resourcelocation);
                     continue;
                 }
+                if(quest.type == QuestsType.HUNT){
+                    quest = GSON.fromJson(entry.getValue(), QuestHunt.class);
+                }else if(quest.type == QuestsType.COLLECT){
+                    quest = GSON.fromJson(entry.getValue(), QuestCollect.class);
+                }
                 quests.add(quest);
             } catch (IllegalArgumentException | JsonParseException jsonparseexception) {
                 LOGGER.error("Parsing error loading quests {}", resourcelocation, jsonparseexception);
             }
         }
-        quests.sort(Comparator.comparingInt(Quest::getOrden));
+        //quests.sort(Comparator.comparingInt(Quest::getOrden));
 
     }
     public static List<Quest> getQuests() {
