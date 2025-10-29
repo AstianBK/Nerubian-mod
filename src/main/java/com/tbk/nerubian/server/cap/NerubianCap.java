@@ -74,7 +74,7 @@ public class NerubianCap implements INerubian {
             this.speechTimeO = this.speechTime;
 
             if(this.speechTime>0){
-                this.speechTimeO--;
+                this.speechTime--;
             }
             if(this.idleTimer<=0){
                 this.idle.start(player.tickCount);
@@ -92,7 +92,7 @@ public class NerubianCap implements INerubian {
 
     @OnlyIn(Dist.CLIENT)
     public float getAnimSpeech(float partialTick){
-        return Mth.lerp(partialTick,this.speechTimeO,this.speechTime);
+        return Mth.lerp(partialTick,this.speechTimeO,this.speechTime) / 160.0F;
     }
 
     public void refreshQuest(Player player){
