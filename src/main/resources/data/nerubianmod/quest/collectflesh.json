@@ -4,5 +4,6 @@
   "type" : "COLLECT",
   "itemId" : "minecraft:rotten_flesh",
   "toCollect" : 10,
-  "tier" : 0
+  "tier" : 0,
+  "reputation" : 10
 }

@@ -4,5 +4,7 @@
   "type" : "HUNT",
   "entityTypeId" : "minecraft:zombie",
   "toHuntEntities" : 10,
-  "tier" : 0
+  "tier" : 0,
+  "reputation" : 10
+
 }

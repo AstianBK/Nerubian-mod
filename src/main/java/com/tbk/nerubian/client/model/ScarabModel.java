@@ -8,16 +8,17 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.tbk.nerubian.NerubianMod;
 import com.tbk.nerubian.client.anim.ScarabAnim;
 import com.tbk.nerubian.server.cap.NerubianCap;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.AnimationUtils;
 import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Quaternionf;
 
@@ -51,6 +52,8 @@ public class ScarabModel<T extends Player> extends HierarchicalModel<T> {
 	private final ModelPart RightFrontLeg;
 	private final ModelPart SectionFrontRight;
 	public float swimAmount;
+	public HumanoidModel.ArmPose leftArmPose = HumanoidModel.ArmPose.EMPTY;
+	public HumanoidModel.ArmPose rightArmPose = HumanoidModel.ArmPose.EMPTY;
 
 	public ScarabModel(ModelPart root) {
 		this.truemain = root.getChild("truemain");
@@ -195,7 +198,7 @@ public class ScarabModel<T extends Player> extends HierarchicalModel<T> {
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float HeadPitch) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		boolean flag = entity.getFallFlyingTicks() > 4;
 		boolean flag1 = entity.isVisuallySwimming();
@@ -206,25 +209,138 @@ public class ScarabModel<T extends Player> extends HierarchicalModel<T> {
 			if (flag1) {
 				this.Head.xRot = this.rotlerpRad(this.swimAmount, this.Head.xRot, (float) (-Math.PI / 4));
 			} else {
-				this.Head.xRot = this.rotlerpRad(this.swimAmount, this.Head.xRot, headPitch * (float) (Math.PI / 180.0));
+				this.Head.xRot = this.rotlerpRad(this.swimAmount, this.Head.xRot, HeadPitch * (float) (Math.PI / 180.0));
 			}
 		} else {
-			this.Head.xRot = headPitch * (float) (Math.PI / 180.0);
+			this.Head.xRot = HeadPitch * (float) (Math.PI / 180.0);
 		}
 		setupAttackAnimation(entity,ageInTicks);
-		NerubianCap.get(entity).ifPresent(nerubianCap -> {
+		boolean flag2 = entity.getMainArm() == HumanoidArm.RIGHT;
+
+		if (entity.isUsingItem()) {
+			boolean flag3 = entity.getUsedItemHand() == InteractionHand.MAIN_HAND;
+			if (flag3 == flag2) {
+				this.poseRightArm(entity);
+			} else {
+				this.poseLeftArm(entity);
+			}
+		} else {
+			boolean flag4 = flag2 ? this.leftArmPose.isTwoHanded() : this.rightArmPose.isTwoHanded();
+			if (flag2 != flag4) {
+				this.poseLeftArm(entity);
+				this.poseRightArm(entity);
+			} else {
+				this.poseRightArm(entity);
+				this.poseLeftArm(entity);
+			}
+		}		NerubianCap.get(entity).ifPresent(nerubianCap -> {
 			this.animate(nerubianCap.idle,ScarabAnim.idle,ageInTicks,1.0F);
 			this.animate(nerubianCap.crouching,ScarabAnim.crouch,ageInTicks,1.0F);
 			this.animate(nerubianCap.attack,ScarabAnim.attack,ageInTicks,1.0F);
-			//this.animate(nerubianCap.use,ScarabAnim.use,ageInTicks,1.0F);
-			this.animate(nerubianCap.block,ScarabAnim.block,ageInTicks,1.0F);
+			this.animate(nerubianCap.swim,ScarabAnim.swim,ageInTicks,1.0F);
+			//this.animate(nerubianCap.block,ScarabAnim.block,ageInTicks,1.0F);
 
 		});
 
 		
 		this.animateWalk(ScarabAnim.move,limbSwing,limbSwingAmount,2.0F,1.0F);
 	}
+	private void poseRightArm(T livingEntity) {
+		switch (this.rightArmPose) {
+			case EMPTY:
+				this.RightArm.yRot = 0.0F;
+				break;
+			case ITEM:
+				this.RightArm.xRot = this.RightArm.xRot * 0.5F - (float) (Math.PI / 10);
+				this.RightArm.yRot = 0.0F;
+				break;
+			case BLOCK:
+				//this.poseBlockingArm(this.RightArm, true);
+				break;
+			case BOW_AND_ARROW:
+				this.RightArm.yRot = -0.1F + this.Head.yRot;
+				this.LeftArm.yRot = 0.1F + this.Head.yRot + 0.4F;
+				this.RightArm.xRot = (float) this.Head.xRot;
+				this.LeftArm.xRot = (float) this.Head.xRot;
+				break;
+			case THROW_SPEAR:
+				this.RightArm.xRot = this.RightArm.xRot * 0.5F - (float) Math.PI;
+				this.RightArm.yRot = 0.0F;
+				break;
+			case CROSSBOW_CHARGE:
+				AnimationUtils.animateCrossbowCharge(this.RightArm, this.LeftArm, livingEntity, true);
+				break;
+			case CROSSBOW_HOLD:
+				animateCrossbowHold(this.RightArm, this.LeftArm, this.Head, true);
+				break;
+			case SPYGLASS:
+				this.RightArm.xRot = Mth.clamp(this.Head.xRot - 1.9198622F - (livingEntity.isCrouching() ? (float) (Math.PI / 12) : 0.0F), -2.4F, 3.3F);
+				this.RightArm.yRot = this.Head.yRot - (float) (Math.PI / 12);
+				break;
+			case TOOT_HORN:
+				this.RightArm.xRot = Mth.clamp(this.Head.xRot, -1.2F, 1.2F) - 1.4835298F;
+				this.RightArm.yRot = this.Head.yRot - (float) (Math.PI / 6);
+				break;
+			case BRUSH:
+				this.RightArm.xRot = this.RightArm.xRot * 0.5F - (float) (Math.PI / 5);
+				this.RightArm.yRot = 0.0F;
+			default:
+				//this.rightArmPose.applyTransform(this, livingEntity, net.minecraft.world.entity.HumanoidArm.RIGHT);
+		}
+	}
 
+	public void animateCrossbowHold(ModelPart rightArm, ModelPart leftArm, ModelPart head, boolean rightHanded) {
+		ModelPart modelpart = rightHanded ? rightArm : leftArm;
+		ModelPart modelpart1 = rightHanded ? leftArm : rightArm;
+		modelpart.yRot = (rightHanded ? -0.3F : 0.3F) + head.yRot;
+		modelpart1.yRot = (rightHanded ? 0.6F : -0.6F) + head.yRot;
+		modelpart.xRot = head.xRot + 0.1F;
+		modelpart1.xRot = head.xRot;
+		this.RightHand.xRot =(float) (-Math.PI / 4);
+	}
+	private void poseLeftArm(T livingEntity) {
+		switch (this.leftArmPose) {
+			case EMPTY:
+				this.LeftArm.yRot = 0.0F;
+				break;
+			case ITEM:
+				this.LeftArm.xRot = this.LeftArm.xRot * 0.5F - (float) (Math.PI / 10);
+				this.LeftArm.yRot = 0.0F;
+				break;
+			case BLOCK:
+				//this.poseBlockingArm(this.LeftArm, false);
+				break;
+			case BOW_AND_ARROW:
+				this.RightArm.yRot = -0.1F + this.Head.yRot - 0.4F;
+				this.LeftArm.yRot = 0.1F + this.Head.yRot;
+				this.RightArm.xRot = (float)  this.Head.xRot;
+				this.LeftArm.xRot = (float)  this.Head.xRot;
+				break;
+			case THROW_SPEAR:
+				this.LeftArm.xRot = this.LeftArm.xRot * 0.5F - (float) Math.PI;
+				this.LeftArm.yRot = 0.0F;
+				break;
+			case CROSSBOW_CHARGE:
+				AnimationUtils.animateCrossbowCharge(this.RightArm, this.LeftArm, livingEntity, false);
+				break;
+			case CROSSBOW_HOLD:
+				animateCrossbowHold(this.RightArm, this.LeftArm, this.Head, false);
+				break;
+			case SPYGLASS:
+				this.LeftArm.xRot = Mth.clamp(this.Head.xRot - 1.9198622F - (livingEntity.isCrouching() ? (float) (Math.PI / 12) : 0.0F), -2.4F, 3.3F);
+				this.LeftArm.yRot = this.Head.yRot + (float) (Math.PI / 12);
+				break;
+			case TOOT_HORN:
+				this.LeftArm.xRot = Mth.clamp(this.Head.xRot, -1.2F, 1.2F) - 1.4835298F;
+				this.LeftArm.yRot = this.Head.yRot + (float) (Math.PI / 6);
+				break;
+			case BRUSH:
+				this.LeftArm.xRot = this.LeftArm.xRot * 0.5F - (float) (Math.PI / 5);
+				this.LeftArm.yRot = 0.0F;
+			default:
+				//this.leftArmPose.applyTransform(this, livingEntity, net.minecraft.world.entity.HumanoidArm.LEFT);
+		}
+	}
 	protected void setupAttackAnimation(T livingEntity, float ageInTicks) {
 		if (!(this.attackTime <= 0.0F)) {
 			HumanoidArm humanoidarm = HumanoidArm.RIGHT;
@@ -269,17 +385,31 @@ public class ScarabModel<T extends Player> extends HierarchicalModel<T> {
 	}
 
 	public void translateToHand(PoseStack p_102855_,boolean isLeft) {
-		this.rotate(p_102855_,this.Torso);
+		this.rotateXZ(p_102855_,this.root());
+		this.rotateXZ(p_102855_,this.Torso);
+		this.rotateXZ(p_102855_,this.UpperChest);
 		if(isLeft){
-			this.rotate(p_102855_,this.LeftArm);
+			//this.rotate(p_102855_,this.Left);
+			this.rotateXZ(p_102855_,this.LeftArm);
+			//this.LeftArm.translateAndRotate(p_102855_);
 			this.LeftHand.translateAndRotate(p_102855_);
 		}else {
-			this.rotate(p_102855_,this.RightArm);
+			//this.rotate(p_102855_,this.Right);
+			this.rotateXZ(p_102855_,this.RightArm);
+			//this.RightArm.translateAndRotate(p_102855_);
 			this.RightHand.translateAndRotate(p_102855_);
-
 		}
 	}
+	public void rotateXZ(PoseStack poseStack,ModelPart part) {
+		poseStack.translate(part.x / 16.0F, 0, part.z / 16.0F);
+		if (part.xRot != 0.0F || part.yRot != 0.0F || part.zRot != 0.0F) {
+			poseStack.mulPose(new Quaternionf().rotationZYX(part.zRot, part.yRot, part.xRot));
+		}
 
+		if (part.xScale != 1.0F || part.yScale != 1.0F || part.zScale != 1.0F) {
+			poseStack.scale(part.xScale, part.yScale, part.zScale);
+		}
+	}
 	public void rotate(PoseStack poseStack,ModelPart part) {
 		//poseStack.translate(part.x / 16.0F, part.y / 16.0F, part.z / 16.0F);
 		if (part.xRot != 0.0F || part.yRot != 0.0F || part.zRot != 0.0F) {

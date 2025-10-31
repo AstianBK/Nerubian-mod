@@ -27,6 +27,14 @@ public class QuestManager extends SimpleJsonResourceReloadListener {
     }
 
 
+    public static Quest getQuestForTittle(String tittle){
+        for (Quest quest: quests) {
+            if(quest.getTitle().equals(tittle)){
+                return quest;
+            }
+        }
+        return null;
+    }
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> p_10793_, ResourceManager p_10794_, ProfilerFiller p_10795_) {
         quests.clear();

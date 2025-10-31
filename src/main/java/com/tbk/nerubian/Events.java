@@ -1,7 +1,9 @@
 package com.tbk.nerubian;
 
 import com.tbk.nerubian.common.quests.QuestManager;
+import com.tbk.nerubian.server.cap.NCapability;
 import com.tbk.nerubian.server.cap.NerubianCap;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -31,22 +33,40 @@ public class Events {
         Entity entity = event.getSource().getEntity();
         if(entity instanceof Player player){
             NerubianCap.get(player).ifPresent(e->{
-                if(!e.currentQuest.isComplete(e)){
-                    NerubianMod.LOGGER.debug("se puede agregar la nueva kill "+event.getEntity().getEncodeId());
+                if(e.currentQuest!=null && !e.currentQuest.isComplete(e)){
 
                     if(e.currentQuest.canAddProgress(event.getEntity().getEncodeId())){
-                        NerubianMod.LOGGER.debug("se mato al enemigo correcto");
-
                         e.progressQuest++;
                     }
                 }
             });
         }
     }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if(event.getEntity().level().isClientSide)return;
+        if (!event.isWasDeath()) return;
+
+        Player oldPlayer = event.getOriginal();
+        Player newPlayer = event.getEntity();
+
+
+        NerubianCap.get(oldPlayer).ifPresent(oldCap->{
+            NerubianCap cap = NerubianCap.get(newPlayer).orElse(null);
+            if(cap!=null){
+                cap.copyFrom(oldCap);
+            }
+            //cap.init(newPlayer);
+
+            //cap.syncNewPlayer((ServerPlayer) newPlayer,oldCap,true);
+
+        });
+    }
     @SubscribeEvent
     public static void onPick(ItemEntityPickupEvent.Pre event){
         NerubianCap.get(event.getPlayer()).ifPresent(e->{
-            if(!e.currentQuest.isComplete(e)){
+            if(e.currentQuest!=null && !e.currentQuest.isComplete(e)){
                 if(e.currentQuest.canAddProgress(event.getItemEntity().getItem().getItem().toString())){
                     e.refreshQuest(event.getPlayer());
                 }

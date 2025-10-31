@@ -9,8 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 public class QuestHunt extends Quest{
     public String entityTypeId;
     public int toHuntEntities;
-    public QuestHunt(String title, QuestsType type, String description, TierQuest tier, FriendlyByteBuf buf) {
-        super(title, QuestsType.HUNT, description, tier);
+    public QuestHunt(String title, QuestsType type, String description, TierQuest tier,int reputation, FriendlyByteBuf buf) {
+        super(title, QuestsType.COLLECT, description, tier,reputation);
         this.entityTypeId = buf.readUtf();
         this.toHuntEntities = buf.readInt();
     }

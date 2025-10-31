@@ -44,7 +44,7 @@ public class ItemScarabLayer<T extends Player,M extends ScarabModel<T>> extends 
                 p_270124_.mulPose(Axis.XP.rotationDegrees(-90.0F));
                 p_270124_.mulPose(Axis.YP.rotationDegrees(180.0F));
                 boolean flag = p_270324_ == HumanoidArm.LEFT;
-                p_270124_.translate((float)(flag ? -9 : 9) / 16.0F, 0.35F, -0.225F);
+                p_270124_.translate((float)(flag ? -2 : 2) / 16.0F, 0.35F, -0.225F);
                 p_270124_.mulPose(Axis.XP.rotationDegrees(45));
                 this.itemInHandRenderer.renderItem(p_270884_, p_270379_, p_270607_, flag, p_270124_, p_270414_, p_270295_);
                 p_270124_.popPose();

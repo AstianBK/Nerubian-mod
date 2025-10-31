@@ -8,8 +8,8 @@ import net.minecraft.network.FriendlyByteBuf;
 public class QuestCollect extends Quest{
     public String itemId;
     public int toCollect;
-    public QuestCollect(String title, QuestsType type, String description, TierQuest tier, FriendlyByteBuf buf) {
-        super(title, QuestsType.COLLECT, description, tier);
+    public QuestCollect(String title, QuestsType type, String description, TierQuest tier,int reputation, FriendlyByteBuf buf) {
+        super(title, QuestsType.COLLECT, description, tier,reputation);
         this.itemId = buf.readUtf();
         this.toCollect = buf.readInt();
     }
