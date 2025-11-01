@@ -25,6 +25,15 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_1.png"),
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_2.png"),
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_3.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_4.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_5.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_6.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_7.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_8.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_9.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_10.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_11.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_12.png")
     };
 
     @Override
@@ -49,7 +58,7 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
                 float centerX = (j1 + xExtra);
                 float centerY = (k1 + yExtra);
 
-                int indexSpeech = (int) ((0.25F*(player.tickCount+partialTick)) % 4.0F);
+                int indexSpeech = (int) ((0.25F*(player.tickCount+partialTick)) % 13.0F);
                 int indexBackground = (int) ((0.1F*(player.tickCount+partialTick)) % 4.0F);
 
                 ResourceLocation locationBackground = FRAMES_BACKGROUND[indexBackground];
@@ -66,7 +75,6 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
                 RenderSystem.enableDepthTest();
                 RenderSystem.disableBlend();
                 guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-
             }
         });
     }

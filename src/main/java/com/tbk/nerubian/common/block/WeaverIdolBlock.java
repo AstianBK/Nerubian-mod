@@ -35,10 +35,9 @@ public class WeaverIdolBlock extends Block {
                 e.speechTimeO = 160;
             }
             if(e.currentQuest!=null && e.currentQuest.isComplete(e)){
-                e.currentReputation += e.currentQuest.getReputation();
-                if(e.currentReputation>=100 && !e.transformComplete){
-                    e.transformComplete = true;
-                    e.timeQuest = 1000;
+                e.currentReputation =Math.min(e.currentQuest.getReputation()+e.currentReputation,100) ;
+                if(e.currentReputation == 100 && !e.itemTransformDrop){
+                    e.itemTransformDrop = true;
                 }
                 if(e.currentQuest.getType() == QuestsType.COLLECT){
                     int shrink = e.currentQuest.getMaxProgress();
@@ -58,6 +57,7 @@ public class WeaverIdolBlock extends Block {
                 e.progressQuest = 0;
                 e.currentQuest = null;
             }else {
+                e.timeQuest = 10000;
                 e.progressQuest = 0;
                 e.currentQuest = getRandomQuest(QuestManager.getQuests());
                 e.refreshQuest(player);

@@ -38,6 +38,7 @@ public class NerubianCap implements INerubian {
     public AnimationState burrow = new AnimationState();
     public AnimationState swim = new AnimationState();
     public boolean transformComplete = false;
+    public boolean itemTransformDrop = false;
     public Quest currentQuest=null;
     public int speechTime=0;
     public int speechTimeO=0;
@@ -70,10 +71,16 @@ public class NerubianCap implements INerubian {
                 BossEvent.BossBarColor color = getColorForQuestType();
                 event.setColor(color);
                 event.setProgress((float) this.progressQuest/this.currentQuest.getMaxProgress());
-
+                if(this.timeQuest--<=0){
+                    this.currentQuest = null;
+                    this.currentReputation -= 10;
+                    this.progressQuest = 0;
+                    this.timeQuest = 0;
+                }
             }else {
                 event.removeAllPlayers();
             }
+
 
 
         }
