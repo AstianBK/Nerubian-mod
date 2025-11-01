@@ -27,6 +27,8 @@ public class NRegistry {
 
     public static final DeferredItem<Item> WEAVER_COCOON = ITEMS.register("weaver_cocoon",()->new Item(new Item.Properties().stacksTo(1)));
 
+    public static final DeferredItem<Item> HUMANITY_TOTEM = ITEMS.register("humanity_totem",()->new Item(new Item.Properties().stacksTo(1)));
+
     public static final DeferredBlock<Block> WEAVER_IDOL_BLOCK = BLOCKS.register("weaver_idol",()->new WeaverIdolBlock( BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
 
     public static final DeferredItem<BlockItem> WEAVER_IDOL_ITEM = ITEMS.registerSimpleBlockItem("weaver_idol_item", WEAVER_IDOL_BLOCK);
@@ -38,5 +40,6 @@ public class NRegistry {
             .displayItems((parameters, output) -> {
                 output.accept(WEAVER_IDOL_ITEM.get());// Add the example item to the tab. For your own tabs, this method is preferred over the event
                 output.accept(WEAVER_COCOON.get());
+                output.accept(HUMANITY_TOTEM.get());
             }).build());
 }

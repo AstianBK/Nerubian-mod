@@ -1,10 +1,9 @@
 {
-  "title" : "Brain Zombie",
-  "description" : "tenes que cazar zombies hermano",
+  "title" : "Hunt Villagers",
+  "description" : "Extinguish their feeble , sacrifice 12 ",
   "type" : "HUNT",
-  "entityTypeId" : "minecraft:zombie",
+  "entityTypeId" : "minecraft:villager",
   "toHuntEntities" : 10,
   "tier" : 0,
   "reputation" : 10
-
 }
