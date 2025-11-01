@@ -1,16 +1,19 @@
 package com.tbk.nerubian;
 
 import com.tbk.nerubian.common.quests.QuestManager;
+import com.tbk.nerubian.common.registry.NRegistry;
 import com.tbk.nerubian.server.cap.NCapability;
 import com.tbk.nerubian.server.cap.NerubianCap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.ItemStackedOnOtherEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -34,7 +37,6 @@ public class Events {
         if(entity instanceof Player player){
             NerubianCap.get(player).ifPresent(e->{
                 if(e.currentQuest!=null && !e.currentQuest.isComplete(e)){
-
                     if(e.currentQuest.canAddProgress(event.getEntity().getEncodeId())){
                         e.progressQuest++;
                     }
@@ -60,9 +62,26 @@ public class Events {
             //cap.init(newPlayer);
 
             //cap.syncNewPlayer((ServerPlayer) newPlayer,oldCap,true);
-
         });
     }
+
+    @SubscribeEvent
+    public static void onEquip(LivingEquipmentChangeEvent event) {
+        if (!(event.getEntity() instanceof Player player)) return;
+        NerubianCap.get(player).ifPresent(nerubianCap -> {
+            if(nerubianCap.transformComplete){
+                if (event.getSlot().isArmor()) {
+                    ItemStack newItem = event.getTo();
+                    if (!newItem.isEmpty()) {
+                        player.getInventory().add(newItem);
+                    }
+
+                    player.setItemSlot(event.getSlot(), ItemStack.EMPTY);
+                }
+            }
+        });
+    }
+
     @SubscribeEvent
     public static void onPick(ItemEntityPickupEvent.Pre event){
         NerubianCap.get(event.getPlayer()).ifPresent(e->{
@@ -72,6 +91,20 @@ public class Events {
                 }
             }
         });
+    }
+
+    @SubscribeEvent
+    public static void onUse(PlayerInteractEvent.RightClickItem event){
+        if(event.getItemStack().is(NRegistry.HUMANITY_TOTEM.get())){
+            NerubianCap.get(event.getEntity()).ifPresent(e->{
+                e.currentReputation = 0;
+                e.transformComplete = false;
+                e.itemTransformDrop = false;
+                e.progressQuest = 0;
+                event.getEntity().kill();
+            });
+        }
+
     }
 
     @SubscribeEvent

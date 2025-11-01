@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import com.tbk.nerubian.client.ScarabRenderer;
 import com.tbk.nerubian.client.gui.IdolSpeechGui;
+import com.tbk.nerubian.client.layer.ArmorScarabLayer;
 import com.tbk.nerubian.client.layer.ItemScarabLayer;
 import com.tbk.nerubian.client.model.ScarabModel;
 import com.tbk.nerubian.server.cap.NerubianCap;
@@ -12,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -53,9 +55,6 @@ import static net.minecraft.client.renderer.entity.LivingEntityRenderer.isEntity
 @EventBusSubscriber(modid = NerubianMod.MODID, value = Dist.CLIENT)
 public class NerubianModClient {
     public NerubianModClient(ModContainer container) {
-        // Allows NeoForge to create a config screen for this mod's configs.
-        // The config screen is accessed by going to the Mods screen > clicking on your mod > clicking on config.
-        // Do not forget to add translations for your config options to the en_us.json file.
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
     @SubscribeEvent
@@ -65,7 +64,9 @@ public class NerubianModClient {
 
     @SubscribeEvent
     public static void registerModel(EntityRenderersEvent.RegisterLayerDefinitions event){
-        event.registerLayerDefinition(ScarabModel.LAYER_LOCATION,ScarabModel::createBodyLayer);
+        event.registerLayerDefinition(ScarabModel.LAYER_LOCATION,Suppliers.ofInstance(ScarabModel.createBodyLayer(new CubeDeformation(0.0F))));
+        event.registerLayerDefinition(ScarabModel.ARMOR_LOCATION,Suppliers.ofInstance(ScarabModel.createBodyLayer(new CubeDeformation(1.0F))));
+
     }
     @SubscribeEvent
     public static void renderModel(RenderLivingEvent.Pre event){
@@ -73,9 +74,11 @@ public class NerubianModClient {
             AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
             NerubianCap.get(player).ifPresent(nerubianCap -> {
                 if (nerubianCap.transformComplete){
+                    EntityRendererProvider.Context context = new EntityRendererProvider.Context(Minecraft.getInstance().getEntityRenderDispatcher(),Minecraft.getInstance().getItemRenderer(), Minecraft.getInstance().getBlockRenderer(),Minecraft.getInstance().gameRenderer.itemInHandRenderer,Minecraft.getInstance().getResourceManager(),Minecraft.getInstance().getEntityModels(),Minecraft.getInstance().font);
                     ScarabModel model = new ScarabModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ScarabModel.LAYER_LOCATION));
-                    ScarabRenderer renderer = new ScarabRenderer(new EntityRendererProvider.Context(Minecraft.getInstance().getEntityRenderDispatcher(),Minecraft.getInstance().getItemRenderer(), Minecraft.getInstance().getBlockRenderer(),Minecraft.getInstance().gameRenderer.itemInHandRenderer,Minecraft.getInstance().getResourceManager(),Minecraft.getInstance().getEntityModels(),Minecraft.getInstance().font),model);
+                    ScarabRenderer renderer = new ScarabRenderer(context,model);
                     ItemScarabLayer layer = new ItemScarabLayer<>(renderer,Minecraft.getInstance().gameRenderer.itemInHandRenderer);
+                    ArmorScarabLayer armorLayer = new ArmorScarabLayer<>(renderer,context.getModelManager());
                     PoseStack poseStack = event.getPoseStack();
                     float partialTicks = event.getPartialTick();
                     int light = event.getPackedLight();
@@ -147,6 +150,7 @@ public class NerubianModClient {
                     model.setupAnim(player,f5, f4, f9, f2, f6);
                     model.renderToBuffer(poseStack,bufferSource.getBuffer(RenderType.entityCutoutNoCull(Util.TEXTURE)),light, OverlayTexture.NO_OVERLAY);
                     layer.render(poseStack,bufferSource,event.getPackedLight(),player,f5,f6,partialTicks,f9,0.0F,0.0F);
+                    armorLayer.render(poseStack,bufferSource,event.getPackedLight(),player,f5,f6,partialTicks,f9,0.0F,0.0F);
                     poseStack.popPose();
                 }
             });

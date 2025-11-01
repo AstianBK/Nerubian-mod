@@ -2,8 +2,10 @@ package com.tbk.nerubian.common.registry;
 
 import com.tbk.nerubian.NerubianMod;
 import com.tbk.nerubian.common.block.WeaverIdolBlock;
+import com.tbk.nerubian.common.item.WeaverCocoonItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -15,6 +17,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.*;
 
+import java.util.List;
+import java.util.Optional;
+
 public class NRegistry {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, NerubianMod.MODID);
 
@@ -25,7 +30,7 @@ public class NRegistry {
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NerubianMod.MODID);
 
-    public static final DeferredItem<Item> WEAVER_COCOON = ITEMS.register("weaver_cocoon",()->new Item(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> WEAVER_COCOON = ITEMS.register("weaver_cocoon",()->new WeaverCocoonItem(new Item.Properties().stacksTo(1).food(new FoodProperties(1,1,true,1, Optional.empty(), List.of()))));
 
     public static final DeferredItem<Item> HUMANITY_TOTEM = ITEMS.register("humanity_totem",()->new Item(new Item.Properties().stacksTo(1)));
 

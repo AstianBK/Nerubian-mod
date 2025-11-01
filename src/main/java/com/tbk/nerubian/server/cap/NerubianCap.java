@@ -53,6 +53,7 @@ public class NerubianCap implements INerubian {
     public String getTimeInMinuteAndSeconds(){
         int seconds=this.timeQuest/20;
         int minutes=seconds/60;
+        seconds = seconds % 60;
         String sSeconds = seconds>9 ? String.valueOf(seconds) : "0"+seconds;
         String sMinutes = minutes>9 ? String.valueOf(minutes) : "0"+minutes;
         return sMinutes+":"+sSeconds;
@@ -161,6 +162,8 @@ public class NerubianCap implements INerubian {
     @Override
     public Tag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
+        tag.putBoolean("drop",this.itemTransformDrop);
+
         tag.putBoolean("transform",this.transformComplete);
         tag.putString("quest",this.currentQuest.getTitle());
         tag.putInt("progress",this.progressQuest);
@@ -172,6 +175,7 @@ public class NerubianCap implements INerubian {
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, Tag nbt) {
         if(nbt instanceof CompoundTag tag){
+            this.itemTransformDrop = tag.getBoolean("drop");
             this.transformComplete = tag.getBoolean("transform");
             this.currentQuest = QuestManager.getQuestForTittle(tag.getString("quest"));
             this.progressQuest = tag.getInt("progress");

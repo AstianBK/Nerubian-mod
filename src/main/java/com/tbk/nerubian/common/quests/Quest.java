@@ -13,12 +13,17 @@ public class Quest {
     protected String description;
     protected TierQuest tier;
     protected int reputation;
-    public Quest(String title, QuestsType type, String description, TierQuest tier,int reputation) {
+    protected int xp;
+    public Quest(String title, QuestsType type, String description, TierQuest tier,int reputation,int xp) {
         this.title = title;
         this.type = type;
         this.description = description;
         this.tier = tier;
         this.reputation = reputation;
+        this.xp = xp;
+    }
+    public int getXp(){
+        return this.xp;
     }
 
     public int getReputation() {
