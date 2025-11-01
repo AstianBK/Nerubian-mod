@@ -47,7 +47,11 @@ public class WeaverIdolBlock extends Block {
                         e.itemTransformDrop = true;
                         player.spawnAtLocation(new ItemStack(NRegistry.WEAVER_COCOON.get()));
                     }
-                    ExperienceOrb.award((ServerLevel) level,pos.getCenter(),e.currentQuest.getXp());
+                    int xp = e.currentQuest.getXp();
+                    if(e.currentReputation == 100){
+                        xp*=2;
+                    }
+                    ExperienceOrb.award((ServerLevel) level,pos.getCenter(),xp);
                     level.playSound(null,player, SoundEvents.ENDER_DRAGON_GROWL, SoundSource.BLOCKS,2.0F,-1.0F);
                     if(e.currentQuest.getType() == QuestsType.COLLECT){
                         int shrink = e.currentQuest.getMaxProgress();
