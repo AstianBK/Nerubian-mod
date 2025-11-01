@@ -19,6 +19,15 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_1.png"),
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_2.png"),
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_3.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_4.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_5.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_6.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_7.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_8.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_9.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_10.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_11.png"),
+            ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_speech_12.png"),
     };
     protected static final ResourceLocation[] FRAMES_BACKGROUND = new ResourceLocation[]{
             ResourceLocation.fromNamespaceAndPath(NerubianMod.MODID,"textures/gui/weaver_background_0.png"),
@@ -52,7 +61,7 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
                 int j1 =  i + 101;
                 int k1 = height - 58 ;
 
-                float xExtra = -40;
+                float xExtra = -60;
                 float yExtra = -155;
 
                 float centerX = (j1 + xExtra);

@@ -5,5 +5,6 @@
   "entityTypeId" : "minecraft:villager",
   "toHuntEntities" : 10,
   "tier" : 0,
-  "reputation" : 10
+  "reputation" : 10,
+  "xp" : 100
 }
