@@ -1,0 +1,9 @@
+{
+  "title" : "Hunt 32 Villagers",
+  "description" : "Spill the lifeblood of those who build and breed in the light. Let their screams be my hymn, their ruin my nourishment",
+  "type" : "HUNT",
+  "entityTypeId" : "minecraft:villager",
+  "toHuntEntities" : 32,
+  "tier" : 0,
+  "reputation" : 20
+}

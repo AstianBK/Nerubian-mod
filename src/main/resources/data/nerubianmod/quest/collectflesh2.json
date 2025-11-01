@@ -1,0 +1,9 @@
+{
+  "title" : "Bring 32 Rotten Flesh",
+  "description" : "Gather the rotten flesh of the fallen. I shall weave their corruption into new life beneath the bedrock.",
+  "type" : "COLLECT",
+  "itemId" : "minecraft:rotten_flesh",
+  "toCollect" : 32,
+  "tier" : 0,
+  "reputation" : 5
+}

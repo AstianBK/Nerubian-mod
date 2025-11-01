@@ -1,0 +1,9 @@
+{
+  "title" : "Hunt 8 Allay",
+  "description" : "Blue spirits of servitude, their purity offends me. Extinguish their light.",
+  "type" : "HUNT",
+  "entityTypeId" : "minecraft:allay",
+  "toHuntEntities" : 8,
+  "tier" : 0,
+  "reputation" : 20
+}
