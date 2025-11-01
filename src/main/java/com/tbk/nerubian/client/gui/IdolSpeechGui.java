@@ -37,10 +37,8 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
         float partialTick = deltaTracker.getRealtimeDeltaTicks();
         NerubianCap.get(player).ifPresent(cap->{
             float percent = cap.getAnimSpeech(partialTick);
-            NerubianMod.LOGGER.debug("Render : " +percent);
             if(percent>0){
 
-                NerubianMod.LOGGER.debug("Entro");
                 int i = width / 2 -140;
                 int j1 =  i + 101;
                 int k1 = height - 58 ;
@@ -60,7 +58,7 @@ public class IdolSpeechGui implements LayeredDraw.Layer {
                 RenderSystem.depthMask(false);
 
                 guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-                guiGraphics.blit(locationBackground, 0, 0, -90, 0.0F, 0.0F, width, height, width, height);
+                //guiGraphics.blit(locationBackground, 0, 0, -90, 0.0F, 0.0F, width, height, width, height);
                 ResourceLocation locationSpeech = FRAMES_SPEECH[indexSpeech];
                 guiGraphics.blit(locationSpeech, (int) centerX, (int) centerY, 0,0,194, 194,194 , 194);
 

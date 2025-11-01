@@ -10,6 +10,9 @@ import com.tbk.nerubian.client.model.ScarabModel;
 import com.tbk.nerubian.server.cap.NerubianCap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -18,10 +21,16 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelPart;
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -60,83 +69,154 @@ public class NerubianModClient {
     }
     @SubscribeEvent
     public static void renderModel(RenderLivingEvent.Pre event){
-        if (event.getEntity() instanceof Player){
-            ScarabModel model = new ScarabModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ScarabModel.LAYER_LOCATION));
-            ScarabRenderer renderer = new ScarabRenderer(new EntityRendererProvider.Context(Minecraft.getInstance().getEntityRenderDispatcher(),Minecraft.getInstance().getItemRenderer(), Minecraft.getInstance().getBlockRenderer(),Minecraft.getInstance().gameRenderer.itemInHandRenderer,Minecraft.getInstance().getResourceManager(),Minecraft.getInstance().getEntityModels(),Minecraft.getInstance().font),model);
-            ItemScarabLayer layer = new ItemScarabLayer<>(renderer,Minecraft.getInstance().gameRenderer.itemInHandRenderer);
-            Player player = (Player) event.getEntity();
-            PoseStack poseStack = event.getPoseStack();
-            float partialTicks = event.getPartialTick();
-            int light = event.getPackedLight();
-            MultiBufferSource bufferSource = event.getMultiBufferSource();
-            event.setCanceled(true);
-            poseStack.pushPose();
-            model.attackTime = player.getAttackAnim(partialTicks);
-            boolean shouldSit = player.isPassenger() && (player.getVehicle() != null && player.getVehicle().shouldRiderSit());
-            float f = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
-            float f1 = Mth.rotLerp(partialTicks, player.yHeadRotO, player.yHeadRot);
-            float f2 = f1 - f;
-            float f7;
-            if (shouldSit && player.getVehicle() instanceof LivingEntity livingplayer) {
-                f = Mth.rotLerp(partialTicks, livingplayer.yBodyRotO, livingplayer.yBodyRot);
-                f2 = f1 - f;
-                f7 = Mth.wrapDegrees(f2);
-                if (f7 < -85.0F) {
-                    f7 = -85.0F;
-                }
+        if (event.getEntity() instanceof AbstractClientPlayer ){
+            AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
+            NerubianCap.get(player).ifPresent(nerubianCap -> {
+                if (nerubianCap.transformComplete){
+                    ScarabModel model = new ScarabModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ScarabModel.LAYER_LOCATION));
+                    ScarabRenderer renderer = new ScarabRenderer(new EntityRendererProvider.Context(Minecraft.getInstance().getEntityRenderDispatcher(),Minecraft.getInstance().getItemRenderer(), Minecraft.getInstance().getBlockRenderer(),Minecraft.getInstance().gameRenderer.itemInHandRenderer,Minecraft.getInstance().getResourceManager(),Minecraft.getInstance().getEntityModels(),Minecraft.getInstance().font),model);
+                    ItemScarabLayer layer = new ItemScarabLayer<>(renderer,Minecraft.getInstance().gameRenderer.itemInHandRenderer);
+                    PoseStack poseStack = event.getPoseStack();
+                    float partialTicks = event.getPartialTick();
+                    int light = event.getPackedLight();
+                    MultiBufferSource bufferSource = event.getMultiBufferSource();
+                    event.setCanceled(true);
+                    poseStack.pushPose();
+                    model.attackTime = player.getAttackAnim(partialTicks);
+                    boolean shouldSit = player.isPassenger() && (player.getVehicle() != null && player.getVehicle().shouldRiderSit());
+                    float f = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
+                    float f1 = Mth.rotLerp(partialTicks, player.yHeadRotO, player.yHeadRot);
+                    float f2 = f1 - f;
+                    float f7;
+                    if (shouldSit && player.getVehicle() instanceof LivingEntity livingplayer) {
+                        f = Mth.rotLerp(partialTicks, livingplayer.yBodyRotO, livingplayer.yBodyRot);
+                        f2 = f1 - f;
+                        f7 = Mth.wrapDegrees(f2);
+                        if (f7 < -85.0F) {
+                            f7 = -85.0F;
+                        }
 
-                if (f7 >= 85.0F) {
-                    f7 = 85.0F;
-                }
+                        if (f7 >= 85.0F) {
+                            f7 = 85.0F;
+                        }
 
-                f = f1 - f7;
-                if (f7 * f7 > 2500.0F) {
-                    f += f7 * 0.2F;
-                }
+                        f = f1 - f7;
+                        if (f7 * f7 > 2500.0F) {
+                            f += f7 * 0.2F;
+                        }
 
-                f2 = f1 - f;
+                        f2 = f1 - f;
+                    }
+
+                    float f6 = Mth.lerp(partialTicks, player.xRotO, player.getXRot());
+                    if (isEntityUpsideDown(player)) {
+                        f6 *= -1.0F;
+                        f2 *= -1.0F;
+                    }
+
+                    f2 = Mth.wrapDegrees(f2);
+                    if (player.hasPose(Pose.SLEEPING)) {
+                        Direction direction = player.getBedOrientation();
+                        if (direction != null) {
+                            float f3 = player.getEyeHeight(Pose.STANDING) - 0.1F;
+                            poseStack.translate((float)(-direction.getStepX()) * f3, 0.0F, (float)(-direction.getStepZ()) * f3);
+                        }
+                    }
+
+                    float f8 = player.getScale();
+                    poseStack.scale(f8, f8, f8);
+                    float f9 = player.tickCount + partialTicks;
+                    setupRotations(player,poseStack,f9, f, partialTicks, f8);
+                    poseStack.scale(-1.0F, -1.0F, 1.0F);
+                    poseStack.translate(0.0F, -1.501F, 0.0F);
+                    float f4 = 0.0F;
+                    float f5 = 0.0F;
+                    if (!shouldSit && player.isAlive()) {
+                        f4 = player.walkAnimation.speed(partialTicks);
+                        f5 = player.walkAnimation.position(partialTicks);
+                        if (player.isBaby()) {
+                            f5 *= 3.0F;
+                        }
+
+                        if (f4 > 1.0F) {
+                            f4 = 1.0F;
+                        }
+                    }
+                    setModelProperties(player,model);
+                    model.prepareMobModel(player,f5,f6,partialTicks);
+                    model.setupAnim(player,f5, f4, f9, f2, f6);
+                    model.renderToBuffer(poseStack,bufferSource.getBuffer(RenderType.entityCutoutNoCull(Util.TEXTURE)),light, OverlayTexture.NO_OVERLAY);
+                    layer.render(poseStack,bufferSource,event.getPackedLight(),player,f5,f6,partialTicks,f9,0.0F,0.0F);
+                    poseStack.popPose();
+                }
+            });
+
+        }
+    }
+
+
+
+    private static void setModelProperties(AbstractClientPlayer clientPlayer,ScarabModel playermodel) {
+        if (clientPlayer.isSpectator()) {
+
+        } else {
+            HumanoidModel.ArmPose humanoidmodel$armpose = getArmPose(clientPlayer, InteractionHand.MAIN_HAND);
+            HumanoidModel.ArmPose humanoidmodel$armpose1 = getArmPose(clientPlayer, InteractionHand.OFF_HAND);
+            if (humanoidmodel$armpose.isTwoHanded()) {
+                humanoidmodel$armpose1 = clientPlayer.getOffhandItem().isEmpty() ? HumanoidModel.ArmPose.EMPTY : HumanoidModel.ArmPose.ITEM;
             }
 
-            float f6 = Mth.lerp(partialTicks, player.xRotO, player.getXRot());
-            if (isEntityUpsideDown(player)) {
-                f6 *= -1.0F;
-                f2 *= -1.0F;
+            if (clientPlayer.getMainArm() == HumanoidArm.RIGHT) {
+                playermodel.rightArmPose = humanoidmodel$armpose;
+                playermodel.leftArmPose = humanoidmodel$armpose1;
+            } else {
+                playermodel.rightArmPose = humanoidmodel$armpose1;
+                playermodel.leftArmPose = humanoidmodel$armpose;
             }
+        }
+    }
 
-            f2 = Mth.wrapDegrees(f2);
-            if (player.hasPose(Pose.SLEEPING)) {
-                Direction direction = player.getBedOrientation();
-                if (direction != null) {
-                    float f3 = player.getEyeHeight(Pose.STANDING) - 0.1F;
-                    poseStack.translate((float)(-direction.getStepX()) * f3, 0.0F, (float)(-direction.getStepZ()) * f3);
-                }
-            }
-
-            float f8 = player.getScale();
-            poseStack.scale(f8, f8, f8);
-            float f9 = player.tickCount + partialTicks;
-            setupRotations(player,poseStack,f9, f, partialTicks, f8);
-            poseStack.scale(-1.0F, -1.0F, 1.0F);
-            poseStack.translate(0.0F, -1.501F, 0.0F);
-            float f4 = 0.0F;
-            float f5 = 0.0F;
-            if (!shouldSit && player.isAlive()) {
-                f4 = player.walkAnimation.speed(partialTicks);
-                f5 = player.walkAnimation.position(partialTicks);
-                if (player.isBaby()) {
-                    f5 *= 3.0F;
+    private static HumanoidModel.ArmPose getArmPose(AbstractClientPlayer player, InteractionHand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
+        if (itemstack.isEmpty()) {
+            return HumanoidModel.ArmPose.EMPTY;
+        } else {
+            if (player.getUsedItemHand() == hand && player.getUseItemRemainingTicks() > 0) {
+                UseAnim useanim = itemstack.getUseAnimation();
+                if (useanim == UseAnim.BLOCK) {
+                    return HumanoidModel.ArmPose.BLOCK;
                 }
 
-                if (f4 > 1.0F) {
-                    f4 = 1.0F;
+                if (useanim == UseAnim.BOW) {
+                    return HumanoidModel.ArmPose.BOW_AND_ARROW;
                 }
-            }
 
-            model.prepareMobModel(player,f5,f6,partialTicks);
-            model.setupAnim(player,f5, f4, f9, f2, f6);
-            model.renderToBuffer(poseStack,bufferSource.getBuffer(RenderType.entityCutoutNoCull(Util.TEXTURE)),light, OverlayTexture.NO_OVERLAY);
-            layer.render(poseStack,bufferSource,event.getPackedLight(),player,f5,f6,partialTicks,f9,0.0F,0.0F);
-            poseStack.popPose();
+                if (useanim == UseAnim.SPEAR) {
+                    return HumanoidModel.ArmPose.THROW_SPEAR;
+                }
+
+                if (useanim == UseAnim.CROSSBOW && hand == player.getUsedItemHand()) {
+                    return HumanoidModel.ArmPose.CROSSBOW_CHARGE;
+                }
+
+                if (useanim == UseAnim.SPYGLASS) {
+                    return HumanoidModel.ArmPose.SPYGLASS;
+                }
+
+                if (useanim == UseAnim.TOOT_HORN) {
+                    return HumanoidModel.ArmPose.TOOT_HORN;
+                }
+
+                if (useanim == UseAnim.BRUSH) {
+                    return HumanoidModel.ArmPose.BRUSH;
+                }
+            } else if (!player.swinging && itemstack.getItem() instanceof CrossbowItem && CrossbowItem.isCharged(itemstack)) {
+                return HumanoidModel.ArmPose.CROSSBOW_HOLD;
+            }
+            HumanoidModel.ArmPose forgeArmPose = net.neoforged.neoforge.client.extensions.common.IClientItemExtensions.of(itemstack).getArmPose(player, hand, itemstack);
+            if (forgeArmPose != null) return forgeArmPose;
+
+            return HumanoidModel.ArmPose.ITEM;
         }
     }
 

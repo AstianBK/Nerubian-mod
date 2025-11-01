@@ -2,12 +2,13 @@ package com.tbk.nerubian.common.quests;
 
 import com.tbk.nerubian.QuestsType;
 import com.tbk.nerubian.TierQuest;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class QuestSacrifice extends Quest{
     public String entityTypeId;
-    public QuestSacrifice(TierQuest tier, String entityTypeId) {
-        super("To Hunt :", QuestsType.HUNT, "To Hunt :"+entityTypeId.split(":")[1], tier);
-        this.entityTypeId = entityTypeId;
+    public QuestSacrifice(String title, QuestsType type, String description, TierQuest tier,int reputation, FriendlyByteBuf buf) {
+        super(title, QuestsType.COLLECT, description, tier,reputation);
+        this.entityTypeId = buf.readUtf();
     }
     public boolean canAddProgress(String idTarget) {
         return this.entityTypeId.equals(idTarget);

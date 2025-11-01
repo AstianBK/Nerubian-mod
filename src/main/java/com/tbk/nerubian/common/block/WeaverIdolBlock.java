@@ -1,12 +1,17 @@
 package com.tbk.nerubian.common.block;
 
 import com.tbk.nerubian.NerubianMod;
+import com.tbk.nerubian.QuestsType;
 import com.tbk.nerubian.common.quests.QuestManager;
 import com.tbk.nerubian.server.cap.NerubianCap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -30,13 +35,32 @@ public class WeaverIdolBlock extends Block {
                 e.speechTimeO = 160;
             }
             if(e.currentQuest!=null && e.currentQuest.isComplete(e)){
+                e.currentReputation += e.currentQuest.getReputation();
+                if(e.currentReputation>=100 && !e.transformComplete){
+                    e.transformComplete = true;
+                    e.timeQuest = 1000;
+                }
+                if(e.currentQuest.getType() == QuestsType.COLLECT){
+                    int shrink = e.currentQuest.getMaxProgress();
+                    Item shrinkItem = BuiltInRegistries.ITEM.get(ResourceLocation.parse(e.currentQuest.getTargetId()));
+                    Inventory inventory = player.getInventory();
+                    for (ItemStack item : inventory.items){
+                        if(item.is(shrinkItem)){
+                            int count = item.getCount();
+                            item.shrink(Math.min(shrink,count));
+                            shrink-=count;
+                        }
+                        if(shrink<=0){
+                            return;
+                        }
+                    }
+                }
                 e.progressQuest = 0;
                 e.currentQuest = null;
             }else {
-                NerubianMod.LOGGER.debug("usado y:"+e.currentQuest);
                 e.progressQuest = 0;
                 e.currentQuest = getRandomQuest(QuestManager.getQuests());
-                NerubianMod.LOGGER.debug("nueva mision adquirida :"+e.currentQuest);
+                e.refreshQuest(player);
             }
         });
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
