@@ -10,6 +10,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.levelgen.placement.RarityFilter;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.registries.*;
@@ -20,9 +21,11 @@ public class NRegistry {
     public static final DeferredRegister.Blocks BLOCKS =
             DeferredRegister.createBlocks(NerubianMod.MODID);
 
+
     public static final DeferredRegister.Items ITEMS =
             DeferredRegister.createItems(NerubianMod.MODID);
 
+    public static final DeferredItem<Item> WEAVER_COCOON = ITEMS.register("weaver_cocoon",()->new Item(new Item.Properties().stacksTo(1)));
 
     public static final DeferredBlock<Block> WEAVER_IDOL_BLOCK = BLOCKS.register("weaver_idol",()->new WeaverIdolBlock( BlockBehaviour.Properties.of().mapColor(MapColor.STONE)));
 
@@ -33,6 +36,7 @@ public class NRegistry {
             .withTabsBefore(CreativeModeTabs.COMBAT)
             .icon(() -> WEAVER_IDOL_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
-                output.accept(WEAVER_IDOL_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(WEAVER_IDOL_ITEM.get());// Add the example item to the tab. For your own tabs, this method is preferred over the event
+                output.accept(WEAVER_COCOON.get());
             }).build());
 }
