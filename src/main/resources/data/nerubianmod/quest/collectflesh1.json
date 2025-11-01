@@ -5,5 +5,6 @@
   "itemId" : "minecraft:rotten_flesh",
   "toCollect" : 16,
   "tier" : 0,
-  "reputation" : 2
+  "reputation" : 2,
+  "xp" : 16
 }

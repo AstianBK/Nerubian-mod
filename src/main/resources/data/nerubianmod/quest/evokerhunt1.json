@@ -1,9 +1,10 @@
 {
-  "title" : "Hunt 16 Evoker",
+  "title" : "Hunt 3 Evoker",
   "description" : "The pale conjurers who toy with the old rites. Drown their arrogance in their own summoned teeth.",
   "type" : "HUNT",
   "entityTypeId" : "minecraft:evoker",
-  "toHuntEntities" : 16,
+  "toHuntEntities" : 3,
   "tier" : 0,
-  "reputation" : 25
+  "reputation" : 25,
+  "xp" : 300
 }
